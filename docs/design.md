@@ -236,7 +236,7 @@ SIZE_LIMIT        = 30 * 1024 * 1024   # 30MB（要件4.5）
 PACK_MARGIN       = 0.93               # ビンパッキングの推定マージン（6.6.2参照）
 
 # --- クロール ---
-REQUEST_INTERVAL  = 3.0                # 秒。全HTTPリクエストに適用（要件4.2）
+REQUEST_INTERVAL  = 1.5                # 秒。全HTTPリクエストに適用（要件4.2）
 MAX_PAGES         = None               # None = 無制限（要件No.3）
 MAX_ARCHIVE_DEPTH = 5                  # zip再帰展開の上限（要件4.3）
 USER_AGENT        = "SaitamaDocCollector/0.1 (+contact: <利用者メールアドレス>)"
@@ -371,7 +371,7 @@ page_seq = 0
 
 while queue:
     url = queue.popleft()
-    resp = fetcher.get(url)           # 3秒レート制御・robots判定・リトライ込み
+    resp = fetcher.get(url)           # 1.5秒レート制御・robots判定・リトライ込み
     if resp is None:                  # 取得失敗 → ログ記録して継続
         continue
 
@@ -448,7 +448,7 @@ class Fetcher:
 
 **レート制御**: 直前のリクエスト完了時刻を保持し、次のリクエスト発行前に `REQUEST_INTERVAL` との差分だけスリープする。リトライの待機時間もこの間隔とは別に加算する。
 
-**robots.txt**: 起動時に `<scheme>://<netloc>/robots.txt` を取得し `RobotFileParser` に読み込ませる。取得失敗（404等）の場合は「制限なし」として扱う（RFC上の慣行）。`Crawl-delay` が指定されており `REQUEST_INTERVAL` より大きい場合は、そちらを採用する（`interval = max(3.0, crawl_delay)`）。
+**robots.txt**: 起動時に `<scheme>://<netloc>/robots.txt` を取得し `RobotFileParser` に読み込ませる。取得失敗（404等）の場合は「制限なし」として扱う（RFC上の慣行）。`Crawl-delay` が指定されており `REQUEST_INTERVAL` より大きい場合は、そちらを採用する（`interval = max(1.5, crawl_delay)`）。
 
 **リトライ**: `MAX_RETRIES` 回まで、`RETRY_BACKOFF` の間隔で再試行する。対象は接続エラー・タイムアウト・`RETRY_STATUS` のHTTPステータス。4xx（429を除く）は再試行せず即座に失敗とする。
 
@@ -718,7 +718,7 @@ def desktop_dir() -> Path:
 
 ### 7.3 中断（Ctrl+C）への対応
 
-3秒間隔の逐次アクセスのため、大規模サイトでは数時間を要する。中断時に収集結果が全て失われるのは損失が大きいため、以下の挙動とする。
+1.5秒間隔の逐次アクセスのため、大規模サイトでは数時間を要する。中断時に収集結果が全て失われるのは損失が大きいため、以下の挙動とする。
 
 - クロール中の `KeyboardInterrupt` を捕捉する。
 - その時点の収集件数を表示し、「収集済みの資料で処理を続行しますか？ (Y/N)」を問う。
@@ -731,7 +731,7 @@ def desktop_dir() -> Path:
 
 ```
 [2026-08-21 15:30:00] 開始 URL=https://example.com/docs/
-[2026-08-21 15:30:01] robots.txt 取得成功 Crawl-delay=なし → 間隔3.0秒
+[2026-08-21 15:30:01] robots.txt 取得成功 Crawl-delay=なし → 間隔1.5秒
 [2026-08-21 15:30:04] ページ取得 (1) https://example.com/docs/
 [2026-08-21 15:30:04]   資料発見 令和6年度予算.pdf
 ...
@@ -787,13 +787,13 @@ LibreOffice: C:\Program Files\LibreOffice\program\soffice.exe
 対象URLを入力してください: https://example.com/docs/
 
 対象範囲: https://example.com/docs/ 配下（ホスト example.com のみ）
-robots.txt: 取得成功 / リクエスト間隔 3.0秒
+robots.txt: 取得成功 / リクエスト間隔 1.5秒
 
 [1/6] クロール中...
   ページ    123 件 | 資料発見    456 件 | 未訪問     12 件
 [1/6] 完了: 135ページを巡回、468件の資料を発見しました。
 
-  ダウンロード予想所要時間: 約 23分（3秒間隔 × 468件）
+  ダウンロード予想所要時間: 約 12分（1.5秒間隔 × 468件）
 
 [2/6] ダウンロード中...
   456/468 (成功 453 / 失敗 3)
@@ -853,7 +853,7 @@ robots.txt: 取得成功 / リクエスト間隔 3.0秒
 
 ### 9.3 実サイトでの確認
 
-本番実行前に、対象サイトの小さなサブパス（資料10件程度のディレクトリ）を指定して一巡させ、robots.txt の判定・文字コード・LibreOffice変換が正しく動くことを確認する。3秒間隔のため、いきなりサイト全体を指定すると問題発覚までに数時間を要する。
+本番実行前に、対象サイトの小さなサブパス（資料10件程度のディレクトリ）を指定して一巡させ、robots.txt の判定・文字コード・LibreOffice変換が正しく動くことを確認する。1.5秒間隔のため、いきなりサイト全体を指定すると問題発覚までに数時間を要する。
 
 ---
 
@@ -861,7 +861,7 @@ robots.txt: 取得成功 / リクエスト間隔 3.0秒
 
 | 項目 | 内容 |
 |---|---|
-| 実行時間 | 3秒間隔の逐次アクセスのため、1000ページ＋2000資料の規模で約2.5時間を要する |
+| 実行時間 | 1.5秒間隔の逐次アクセスのため、1000ページ＋2000資料の規模で約1.3時間を要する |
 | JavaScript描画ページ | `requests` + `BeautifulSoup` は静的HTMLのみを解析する。JavaScriptで動的に生成されるリンクは収集できない。対象サイトがSPA構成の場合は Playwright 等への置き換えが必要になる |
 | ディスク使用量 | 元ファイル・変換後PDF・結合結果が一時的に共存するため、総資料サイズの約3倍の空き容量を要する |
 | 結合PDFのしおり | 本設計では結合PDFに目次・しおりを付けない。どの資料がどこにあるかは manifest.csv で追跡する（将来拡張の候補） |
