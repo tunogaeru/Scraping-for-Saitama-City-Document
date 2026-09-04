@@ -7,7 +7,7 @@ SIZE_LIMIT = 30 * 1024 * 1024   # 30MB（要件4.5）
 PACK_MARGIN = 0.93              # ビンパッキングの推定マージン（設計6.7.3）
 
 # --- クロール -------------------------------------------------------------
-REQUEST_INTERVAL = 3.0          # 秒。全HTTPリクエストに適用（要件4.2）
+REQUEST_INTERVAL = 1.5          # 秒。全HTTPリクエストに適用（要件4.2）
 MAX_PAGES: int | None = None    # None = 無制限（要件No.3）
 MAX_ARCHIVE_DEPTH = 5           # zip再帰展開の上限（要件4.3）
 MAX_HTML_BYTES = 20 * 1024 * 1024   # HTMLとして読み込む上限

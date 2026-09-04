@@ -6,7 +6,7 @@
 
     python tests/demo_local.py                # 出力は一時フォルダ
     python tests/demo_local.py --desktop      # 出力を実際のデスクトップに作る
-    python tests/demo_local.py --interval 3   # 本番と同じ3秒間隔で実行する
+    python tests/demo_local.py --interval 1.5 # 本番と同じ1.5秒間隔で実行する
 """
 
 from __future__ import annotations

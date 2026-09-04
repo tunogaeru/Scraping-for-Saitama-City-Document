@@ -53,10 +53,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None,
+         printer: cli.Printer | None = None) -> int:
+    """引数なしで実行するとコンソール版。
+
+    printer を差し替えると入出力先を変更できる（web.py のブラウザ版が利用する）。
+    """
     args = parse_args(argv)
     winenv.setup_console()
-    printer = cli.Printer()
+    printer = printer or cli.Printer()
     printer.header()
 
     if args.max_pages is not None:
